@@ -1,7 +1,7 @@
 ##################################################
 # Publisher RDS
 module "publisher-rds-instance" {
-  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=1.0"
+  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=2.1"
 
   db_backup_retention_period = "2"
 
