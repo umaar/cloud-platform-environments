@@ -35,7 +35,7 @@ for _c in namespaces/*; do
         terraform apply \
           -auto-approve \
           -var="cluster_name=${cluster%.k8s.cloud-platform.dsd.io}" \
-          -var="cluster_state_bucket=cp-test-2-terraform"
+          -var="cluster_state_bucket=cp-test-2-kops"
         cd $OLDPWD
       fi
     fi
