@@ -50,10 +50,8 @@ resource "kubernetes_secret" "user-datastore-elasticache" {
 
   data {
     primary_endpoint_address = "${module.user-datastore-elasticache.primary_endpoint_address}"
-    member_clusters          = "${jsonencode(module.user-datastore-elasticache.member_clusters)}"
     auth_token               = "${module.user-datastore-elasticache.auth_token}"
   }
 }
 
 ########################################################
-
