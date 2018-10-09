@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-conf
+  namespace: laa-fala-staging
+data:
+  # Adding new entries here will make them appear as files in the deployment.
+  nginx.conf: |
+    user nginx;
+    worker_processes 1;
+
+    error_log /var/log/nginx/error.log warn;
+    pid       /var/run/nginx.pid;
+
+    events {
+        worker_connections 1024;
+    }
+
+    http {
+      sendfile          on;
+      keepalive_timeout 65;
+
+      upstream app {
+        server 127.0.0.1:8000;
+      }
+
+      server {
+        listen 80;
+
+        location /eureka {
+          return 200 'Eureka!';
+          add_header Content-Type text/plain;
+        }
+
+        location /static/ {
+          # alias /home/app/fala/static/;
+        }
+
+        location / {
+          proxy_pass      http://app;
+          proxy_redirect  off;
+          # uwsgi_pass  django;
+          # include     uwsgi_params; # the uwsgi_params file you installed
+        }
+      }
+    }
