@@ -5,42 +5,27 @@ metadata:
   namespace: laa-fala-staging
 data:
   # Adding new entries here will make them appear as files in the deployment.
-  nginx.conf: |
-    user nginx;
-    worker_processes 1;
-
-    error_log /var/log/nginx/error.log warn;
-    pid       /var/run/nginx.pid;
-
-    events {
-        worker_connections 1024;
+  common.conf: |
+    upstream app {
+      server 127.0.0.1:8000;
     }
 
-    http {
-      sendfile          on;
-      keepalive_timeout 65;
+    server {
+      listen 80;
 
-      upstream app {
-        server 127.0.0.1:8000;
+      location /eureka {
+        return 200 'Eureka!';
+        add_header Content-Type text/plain;
       }
 
-      server {
-        listen 80;
+      location /static/ {
+        # alias /home/app/fala/static/;
+      }
 
-        location /eureka {
-          return 200 'Eureka!';
-          add_header Content-Type text/plain;
-        }
-
-        location /static/ {
-          # alias /home/app/fala/static/;
-        }
-
-        location / {
-          proxy_pass      http://app;
-          proxy_redirect  off;
-          # uwsgi_pass  django;
-          # include     uwsgi_params; # the uwsgi_params file you installed
-        }
+      location / {
+        # include     uwsgi_params;
+        # uwsgi_pass  http:app:8000;
+        proxy_pass      http://app;
+        proxy_redirect  off;
       }
     }
