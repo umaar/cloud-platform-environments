@@ -18,12 +18,12 @@ for _c in namespaces/*; do
   log green "found cluster ${cluster}"
   ( set -x; kubectl config use-context "${cluster}" ) || { log red "no context found, skipping ${cluster}" && continue; }
   log blue "applying cluster-level resources for ${cluster}"
-  ( set -x; kubectl apply -f "${_c}" ) || log blue "no global resources to apply"
+  ( set -x; kubectl apply --dry-run -f "${_c}" ) || log blue "no global resources to apply"
   for _f in ${_c}/*; do
     if [ -d "${_f}" ]; then
       namespace="$(basename ${_f})"
       log blue "applying resources for namespace ${namespace} in ${cluster}"
-      ( set -x; kubectl -n "${namespace}" apply -f "${_f}" )
+      ( set -x; kubectl -n "${namespace}" apply --dry-run -f "${_f}" )
       terraform_resources_path="namespaces/${cluster}/${namespace}/resources"
       if [ -d "${terraform_resources_path}" ]; then
         cd "${terraform_resources_path}"
@@ -32,8 +32,7 @@ for _c in namespaces/*; do
           -backend-config="bucket=moj-cp-k8s-investigation-environments-terraform" \
           -backend-config="key=${cluster}/${namespace}/terraform.tfstate" \
           -backend-config="region=eu-west-1"
-        terraform apply \
-          -auto-approve \
+        terraform plan \
           -var="cluster_name=${cluster%.k8s.integration.dsd.io}" \
           -var="cluster_state_bucket=moj-cp-k8s-investigation-platform-terraform"
         cd $OLDPWD
